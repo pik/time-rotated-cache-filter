@@ -18,6 +18,7 @@
 # define max(a,b) (((a)<(b)) ? (b) : (a))
 #endif
 
+/* Note this will not work correctly for negative numbers */
 #define  MOD(a, b)    (a%b)
 
 typedef struct { 

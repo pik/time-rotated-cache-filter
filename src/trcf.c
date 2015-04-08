@@ -268,36 +268,9 @@ void trcf_add_item(time_rotated_cache_filter_t * trcf, const char *s, size_t len
     HASH_128(s, len, hh);
     trc1= trcf_get(trcf, -1);
     if (trc_add_item(trc1, hh) != NULL) {
-        /* If a value was popped and the cache is at 50% occupancy add a cache and add the value*/
+        /* If a value was popped and the cache is at 50% occupancy add a cache */
         if (((double)trc1->count / trc1->size_k) > MAX_OCCUPANCY) {
             trcf_add_cache_best_guess(trcf);
-            trc_add_item(trcf_get(trcf, -1), hh);
-        }
-    }
-}
-
-void trcf_add_stash(time_rotated_cache_filter_t * trcf, const char *s, size_t len) { 
-    uint64_t hh[2]; 
-    HASH_128(s, len, hh);
-    time_rotated_cache_t * trc1, * trc2;
-    if (trcf->idx > 1) { 
-        trc2 = trcf_get(trcf, -2);
-        if ((double)trc2->count/trc2->size_k < MAX_OCCUPANCY*1.2) {
-            if (trc_add_item(trc2, hh) != NULL) {
-                trc_add_item(trcf_get(trcf, -1), hh);
-            }
-        }
-        else {
-            if (trc_add_item(trcf_get(trcf, -1), hh) != NULL) {
-                trcf_add_cache_best_guess(trcf); 
-                trc_add_item(trcf_get(trcf, -1), hh);
-            }
-        }
-    }
-    else {
-        if (trc_add_item(trcf_get(trcf, -1), hh) != NULL) {
-            trcf_add_cache_best_guess(trcf); 
-            trc_add_item(trcf_get(trcf, -1), hh);
         }
     }
 }
@@ -325,9 +298,8 @@ int trcf_add_if_new(time_rotated_cache_filter_t * trcf, const char *s, size_t le
         }
     }
     trc1 = trcf_get(trcf, -1);
-    if ((trc_add_item(trc1, hh) == 0) && (((double)trc1->count / trc1->size_k) > MAX_OCCUPANCY)) {
+    if ((trc_add_item(trc1, hh) != NULL ) && (((double)trc1->count / trc1->size_k) > MAX_OCCUPANCY)) {
         trcf_add_cache_best_guess(trcf);
-        trc_add_item(trcf_get(trcf, -1), hh);
     }
     return 1;
 }
